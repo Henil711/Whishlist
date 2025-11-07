@@ -30,6 +30,8 @@ export class GenericScraper extends BaseScraper {
       const title = await page.title();
 
       const priceSelectors = [
+        '.price',
+        'meta[property="product:price:amount"]',
         '[class*="price"]',
         '[id*="price"]',
         '[data-price]',
@@ -39,27 +41,50 @@ export class GenericScraper extends BaseScraper {
 
       let price: number | undefined;
       let currency = 'USD';
+      let candidatePrices: number[] = [];
+      let detectedCurrency: string | undefined;
 
       for (const selector of priceSelectors) {
         try {
           if (selector.startsWith('meta')) {
             const content = await page.getAttribute(selector, 'content');
             if (content) {
-              price = this.normalizePrice(content);
-              if (price !== undefined) break;
+              const extracted = this.extractValidPrices(content);
+              candidatePrices.push(...extracted);
+
+              detectedCurrency = this.extractCurrency(content);
             }
           } else {
-            const priceText = await page.locator(selector).first().textContent().catch(() => null);
+            const el = page.locator(selector).first();
+            const priceText = await el.textContent().catch(() => null);
             if (priceText) {
-              price = this.normalizePrice(priceText);
-              currency = this.extractCurrency(priceText);
-              if (price !== undefined) break;
+              const extracted = this.extractValidPrices(priceText);
+              candidatePrices.push(...extracted);
+
+              detectedCurrency = this.extractCurrency(priceText);
             }
+          }
+          if (candidatePrices.length > 0 && detectedCurrency) {
+            break;
           }
         } catch {
           continue;
         }
       }
+
+      candidatePrices = [...new Set(candidatePrices)].sort((a, b) => a - b);
+
+      price = candidatePrices.length > 0 ? candidatePrices[0] : undefined;
+
+      if (!detectedCurrency) {
+        const metaCurrency = await page.getAttribute(
+          'meta[property="product:price:currency"], meta[itemprop="priceCurrency"]',
+          'content'
+        );
+        detectedCurrency = metaCurrency || 'INR';
+      }
+
+      currency = detectedCurrency;
 
       const imageSelectors = [
         'meta[property="og:image"]',
