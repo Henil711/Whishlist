@@ -19,6 +19,25 @@ export abstract class BaseScraper {
     return null;
   }
 
+  protected extractValidPrices(text: string): number[] {
+    const matches = text.match(/[₹$€£]?\s?\d{1,3}(?:,\d{3})*(?:\.\d+)?/g);
+    if (!matches) return [];
+
+    return matches
+      .map(m => parseFloat(m.replace(/[^0-9.]/g, "")))
+      .filter(n => !isNaN(n) && n > 0 && n < 10000000);
+  }
+
+  protected extractCurrency(text: string): string | undefined {
+    const symbolMatch = text.match(/(₹|€|\$|£)/);
+    if (symbolMatch) return symbolMatch[0];
+
+    const codeMatch = text.match(/\b(USD|EUR|INR|GBP)\b/i);
+    if (codeMatch) return codeMatch[0].toUpperCase();
+
+    return undefined;
+  }
+
   protected normalizePrice(priceText: string): number | undefined {
     const cleaned = priceText.replace(/[^0-9.,]/g, '');
     const normalized = cleaned.replace(/,/g, '');
@@ -26,7 +45,7 @@ export abstract class BaseScraper {
     return isNaN(price) ? undefined : price;
   }
 
-  protected extractCurrency(priceText: string): string {
+  protected extractCurrency1(priceText: string): string {
     const currencySymbols: { [key: string]: string } = {
       '$': 'USD',
       '₹': 'INR',
