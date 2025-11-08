@@ -34,21 +34,28 @@ export function AddProductModal({ isOpen, onClose, onAdd }: AddProductModalProps
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-slate-900">Add Product</h2>
+    <div
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md animate-slideUp"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-primary-900">Add Product</h2>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 transition"
+            className="text-primary-400 hover:text-primary-600 transition"
+            aria-label="Close"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-primary-900 mb-2">
               Product URL
             </label>
             <input
@@ -56,16 +63,16 @@ export function AddProductModal({ isOpen, onClose, onAdd }: AddProductModalProps
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://www.amazon.com/..."
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+              className="w-full px-4 py-2.5 border border-primary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition bg-white text-primary-900 placeholder-primary-400"
               required
             />
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-primary-600 mt-1.5">
               Supported: Amazon, Flipkart, Walmart, AliExpress, and more
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-primary-900 mb-2">
               Target Price (Optional)
             </label>
             <input
@@ -74,15 +81,15 @@ export function AddProductModal({ isOpen, onClose, onAdd }: AddProductModalProps
               value={targetPrice}
               onChange={(e) => setTargetPrice(e.target.value)}
               placeholder="100.00"
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+              className="w-full px-4 py-2.5 border border-primary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent transition bg-white text-primary-900 placeholder-primary-400"
             />
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-primary-600 mt-1.5">
               Get notified when the price drops to or below this amount
             </p>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            <div className="bg-error-50 border border-error-200 text-error-700 px-4 py-3 rounded-lg text-sm">
               {error}
             </div>
           )}
@@ -91,14 +98,14 @@ export function AddProductModal({ isOpen, onClose, onAdd }: AddProductModalProps
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition"
+              className="flex-1 px-4 py-2.5 border border-primary-200 text-primary-700 rounded-lg hover:bg-primary-50 transition font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2.5 bg-accent-600 hover:bg-accent-700 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
               {loading ? 'Adding...' : 'Add Product'}
             </button>
